@@ -1,0 +1,114 @@
+﻿@model WebCourseWorkApplication.Models.AnnCommConnection
+
+<table class="table">
+
+        <tr>
+            <th>
+                Title
+            </th>
+            <th>
+                Extra Details
+            </th>
+            <th>
+                Timestamp
+            </th>
+            <th>
+                UserName
+            </th>
+            <th>
+                Viewed By
+            </th>
+            <th></th>
+        </tr>
+
+    @foreach (var item in Model.Announcement.Reverse())
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title, new {id=item.AnnouncementId, @class="display"})
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExtraDetails)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VUsers.Count)
+            </td>
+            <td>
+                @if (ViewBag.canPost)
+                {
+                    @Html.ActionLink("Edit", "Edit", new { id = item.AnnouncementId }) @:|
+                    @Html.ActionLink("Delete", "Delete", new { id = item.AnnouncementId }) @:|
+
+                }
+
+                   
+                
+                @Html.ActionLink("Details", "Details", new { id = item.AnnouncementId }) 
+                
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <dir id="commentTable">
+                    <table class="table">
+
+
+                        @foreach (var comm in item.Comment)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => comm.Description)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => comm.User.Email)
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Edit", "Edit", "Comments", new { id = comm.CommentId },null) |
+                                    @Html.ActionLink("Details", "Details", "Comments", new { id = comm.CommentId }) |
+                                    @Html.ActionLink("Delete", "Delete","Comments", new { id = comm.CommentId }, null)
+                                </td>
+                            </tr>
+                        }
+
+                    </table>
+                </dir>
+            </td>
+        </tr>
+        <tr>
+            <td>
+               
+                <div id="addCommentDiv">
+
+                    <div id="announcementCreateForm">
+                        @using (Ajax.BeginForm("AJAXCommentCreate", "Announcements", new { id = item.AnnouncementId }, 
+                        new AjaxOptions
+                        {
+                            InsertionMode = InsertionMode.Replace,
+                            HttpMethod = "POST",
+                            UpdateTargetId = "tableDiv"
+                        }))
+                        {
+                            <div class="form-group">
+                                @Html.AntiForgeryToken()
+                                @Html.LabelFor(model => model.Comment.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.Comment.Description, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.Comment.Description, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                </div> 
+                    
+            </td>
+        </tr>
+    }
+
+</table>
